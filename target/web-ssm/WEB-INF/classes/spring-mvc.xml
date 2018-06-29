@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                         http://www.springframework.org/schema/aop
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                        http://www.springframework.org/schema/mvc
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+http://www.springframework.org/schema/task
+       http://www.springframework.org/schema/task/spring-task-3.0.xsd
+">
+
+    <!-- 自动扫描  @Controller-->
+    <context:component-scan base-package="com.ryo.controller"/>
+
+    <!--避免IE执行AJAX时，返回JSON出现下载文件 -->
+    <bean id="mappingJacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/html;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 启动SpringMVC的注解功能，完成请求和注解POJO的映射 -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJacksonHttpMessageConverter"/> <!-- JSON转换器 -->
+            </list>
+        </property>
+    </bean>
+
+
+    <!-- 定义跳转的文件的前后缀 ，视图模式配置 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/page/" />
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- 文件上传配置 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!-- 上传文件大小限制为31M，31*1024*1024 -->
+        <property name="maxUploadSize" value="32505856"/>
+        <!-- 内存中的最大值 -->
+        <property name="maxInMemorySize" value="4096"/>
+    </bean>
+    <!-- S 配置定时任务-->
+   <!-- <task:executor id="executor" pool-size="5" />
+    &lt;!&ndash;配置线程池&ndash;&gt;
+    <task:scheduler id="scheduler" pool-size="10" />
+    <task:annotation-driven executor="executor" scheduler="scheduler" />-->
+    <!--E 配置定时任务-->
+<!--    <bean id="dsum" class="com.ryo.controller.BaseController"></bean>
+    <task:scheduled-tasks>
+        <task:scheduled ref="dsum" method="Dsum" cron="0 * * * * ?"/>
+    </task:scheduled-tasks>-->
+    <!-- 激活自动代理功能 -->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+   <!-- &lt;!&ndash; 日志切面类(SystemLogAspect不需要@Component注解) &ndash;&gt;
+    <bean id="logInterceptor" class="com.ryo.aop.SystemLogAspect"/>
+    <aop:config>
+        &lt;!&ndash;定义切面&ndash;&gt;
+        <aop:aspect id="logAspect" ref="logInterceptor">
+            &lt;!&ndash; 定义切入点 (配置在com.gray.user.controller下所有的类在调用之前都会被拦截)&ndash;&gt;
+            <aop:pointcut expression="execution(* com.ryo.controller.*.*(..))" id="logPointCut"/>
+            &lt;!&ndash;方法执行之前被调用执行的&ndash;&gt;
+            <aop:before method="doBefore" pointcut-ref="logPointCut"/>&lt;!&ndash;一个切入点的引用&ndash;&gt;
+            <aop:after method="after" pointcut-ref="logPointCut"/>&lt;!&ndash;一个切入点的引用&ndash;&gt;
+        </aop:aspect>
+    </aop:config>-->
+
+    <!-- 任务1配置 -->
+    <bean id="job1" class="com.ryo.controller.common.JobController"></bean>
+    <bean id="jobDetail1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 执行的类 -->
+        <property name="targetObject" ref="job1"/>
+        <!-- 类中的方法 -->
+        <property name="targetMethod" value="ExecJob"/>
+    </bean>
+    <!--任务规则 -->
+    <bean id="cron1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail1"/>
+        <property name="cronExpression" value="0/300 * * * * ?"/>
+    </bean>
+
+    <bean id="jobDetail2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <property name="targetObject" ref="job1"/>
+    <property name="targetMethod" value="ExecJob2"/>
+</bean>
+    <bean id="cron2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail2"/>
+        <property name="cronExpression" value="0/300 * * * * ?"/>
+    </bean>
+    <!-- 总配置 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="cron1"></ref>
+                   <ref bean="cron2"></ref>
+            </list>
+        </property>
+    </bean>
+</beans>

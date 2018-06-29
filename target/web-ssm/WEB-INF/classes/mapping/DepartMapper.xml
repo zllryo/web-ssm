@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryo.dao.DepartMapper" >
+  <resultMap id="BaseResultMap" type="com.ryo.model.Depart" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="departname" property="departname" jdbcType="VARCHAR" />
+    <result column="departcode" property="departcode" jdbcType="VARCHAR" />
+    <result column="departdesc" property="departdesc" jdbcType="VARCHAR" />
+    <result column="fatherid" property="fatherid" jdbcType="INTEGER" />
+    <association property="user" javaType="com.ryo.model.User">
+      <id column="oid" jdbcType="INTEGER" property="id" />
+      <result column="username" jdbcType="VARCHAR" property="username" />
+      <result column="password" jdbcType="VARCHAR" property="password" />
+      <result column="sex" jdbcType="VARCHAR" property="sex" />
+      <result column="age" jdbcType="INTEGER" property="age" />
+      <result column="address" jdbcType="VARCHAR" property="address" />
+      <result column="roleid" jdbcType="INTEGER" property="roleid" />
+      <result column="deaprtid" jdbcType="INTEGER" property="deaprtid" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, departname, departcode, departdesc, fatherid
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from depart
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from depart
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ryo.model.Depart" >
+    insert into depart (id, departname, departcode, 
+      departdesc, fatherid)
+    values (#{id,jdbcType=INTEGER}, #{departname,jdbcType=VARCHAR}, #{departcode,jdbcType=VARCHAR}, 
+      #{departdesc,jdbcType=VARCHAR}, #{fatherid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryo.model.Depart" >
+    insert into depart
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="departname != null" >
+        departname,
+      </if>
+      <if test="departcode != null" >
+        departcode,
+      </if>
+      <if test="departdesc != null" >
+        departdesc,
+      </if>
+      <if test="fatherid != null" >
+        fatherid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="departname != null" >
+        #{departname,jdbcType=VARCHAR},
+      </if>
+      <if test="departcode != null" >
+        #{departcode,jdbcType=VARCHAR},
+      </if>
+      <if test="departdesc != null" >
+        #{departdesc,jdbcType=VARCHAR},
+      </if>
+      <if test="fatherid != null" >
+        #{fatherid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryo.model.Depart" >
+    update depart
+    <set >
+      <if test="departname != null" >
+        departname = #{departname,jdbcType=VARCHAR},
+      </if>
+      <if test="departcode != null" >
+        departcode = #{departcode,jdbcType=VARCHAR},
+      </if>
+      <if test="departdesc != null" >
+        departdesc = #{departdesc,jdbcType=VARCHAR},
+      </if>
+      <if test="fatherid != null" >
+        fatherid = #{fatherid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryo.model.Depart" >
+    update depart
+    set departname = #{departname,jdbcType=VARCHAR},
+      departcode = #{departcode,jdbcType=VARCHAR},
+      departdesc = #{departdesc,jdbcType=VARCHAR},
+      fatherid = #{fatherid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
