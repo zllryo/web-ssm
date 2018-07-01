@@ -20,6 +20,25 @@ http://www.springframework.org/schema/task
     <!-- 自动扫描  @Controller-->
     <context:component-scan base-package="com.ryo.controller"/>
 
+    <!-- 安全管理器 -->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+    <!--启用Shiro相关的注解-->
+    <bean
+            class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.apache.shiro.authz.UnauthorizedException">
+                    /noauthorization
+                </prop>
+                <prop key="org.apache.shiro.authz.UnauthenticatedException">
+                    /noauthorization
+                </prop>
+            </props>
+        </property>
+    </bean>
+
     <!--避免IE执行AJAX时，返回JSON出现下载文件 -->
     <bean id="mappingJacksonHttpMessageConverter"
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
@@ -110,4 +129,5 @@ http://www.springframework.org/schema/task
             </list>
         </property>
     </bean>
+
 </beans>

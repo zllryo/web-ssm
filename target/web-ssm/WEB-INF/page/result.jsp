@@ -147,6 +147,10 @@
             data: {id: id},
             success: function (data) {
                 $("#miandiv").html(data);
+            },
+            error: function (data) {
+                alert(JSON.stringify(data));
+
             }
         })
     }
@@ -203,7 +207,7 @@
                 </li>
                 <li>
                     <a href="#">
-                        <i class="glyphicon glyphicon-calendar"></i>
+                        <i class="glyphicon glyphicon-calendar">${userCode}</i>
                         图表统计
                     </a>
                 </li>
@@ -263,6 +267,7 @@
                         <th>姓名</th>
                         <th>年龄</th>
                         <th>部门</th>
+                        <th>角色</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -273,6 +278,7 @@
                             <td>${x.username}</td>
                             <td>${x.age}</td>
                             <td>${x.depart.departname}</td>
+                            <td>${x.role.rolename}</td>
                             <td>
                                 <button onclick="lookBy(${x.id})" class="btn  btn-success" data-toggle="modal"
                                         data-target="#myModal">

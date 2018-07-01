@@ -8,6 +8,9 @@ import com.ryo.model.User;
 import com.ryo.service.RoleService;
 import com.ryo.service.UserService;
 import com.ryo.utils.RedisCacheUtil;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +53,13 @@ public class LoginController extends BaseController{
         map2.put("username",user.getUsername());
         map2.put("password",user.getPassword());
         User model= userService.selectByNameandWord(map2);*/
+
+        Subject subject = SecurityUtils.getSubject();//获取当前用户对象
+        //生成令牌(传入用户输入的账号和密码)
+        UsernamePasswordToken token=new UsernamePasswordToken(model.getUsername(),model.getPassword());
+        //这里会加载自定义的realm
+        subject.login(token);//把令牌放到login里面进行查询,如果查询账号和密码时候匹配,如果匹配就把user对象获取出来,失败就抛异常
+
 
         if(model!=null)
         {
@@ -103,6 +113,12 @@ public class LoginController extends BaseController{
 
     @RequestMapping("result")
     public String result(HttpServletRequest request) {
+        //从shiro的session中取出activeUser
+        Subject subject= SecurityUtils.getSubject();
+        //取出身份信息
+        String userCode=(String)subject.getPrincipal();
+        //通过model传到页面
+        session.setAttribute("userCode",userCode);
         return "result";
     }
 
@@ -111,5 +127,10 @@ public class LoginController extends BaseController{
     {
         session.invalidate();
         return  "index";
+    }
+
+    @RequestMapping("noauthorization")
+    public String noauthorization() {
+        return "noauthorization";
     }
 }

@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.ryo.model.User;
 import com.ryo.service.UserService;
 import com.ryo.utils.RedisCacheUtil;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,6 +80,7 @@ public class UserController extends  BaseController{
     }
 
     @RequestMapping("addBy")
+    @RequiresRoles("超级管理员")
     public String addBy()
     {
         return  "useradd";
