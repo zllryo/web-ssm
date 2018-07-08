@@ -1,8 +1,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/cache
+       http://www.springframework.org/schema/cache/spring-cache.xsd"
        default-autowire="byName">
 
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
@@ -15,12 +17,14 @@
 
         <property name="timeBetweenEvictionRunsMillis" value="60000"></property> -->
 
-
-        <property name="maxIdle" value="${redis.maxIdle}"></property>
+        <property name="maxTotal" value="300"></property>
+        <property name="maxIdle" value="50"></property>
+        <property name="minIdle" value="5"></property>
+        <property name="maxWaitMillis" value="100000"></property>
 
         <property name="minEvictableIdleTimeMillis" value="${redis.minEvictableIdleTimeMillis}"></property>
 
-        <property name="numTestsPerEvictionRun" value="${redis.numTestsPerEvictionRun}"></property>
+        <property name="numTestsPerEvictionRun" value="10"></property>
 
         <property name="timeBetweenEvictionRunsMillis" value="${redis.timeBetweenEvictionRunsMillis}"></property>
 
@@ -62,5 +66,28 @@
 
 
     </bean>
+
+<!--    &lt;!&ndash;spring cache&ndash;&gt;
+    <bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager"
+          c:redisOperations-ref="jedisTemplate">
+        &lt;!&ndash; 默认缓存10分钟 &ndash;&gt;
+        <property name="defaultExpiration" value="600"/>
+        <property name="usePrefix" value="true"/>
+        &lt;!&ndash; cacheName 缓存超时配置，半小时，一小时，一天 &ndash;&gt;
+        <property name="expires">
+            <map key-type="java.lang.String" value-type="java.lang.Long">
+                <entry key="halfHour" value="1800"/>
+                <entry key="hour" value="3600"/>
+                <entry key="oneDay" value="86400"/>
+                &lt;!&ndash; shiro cache keys 对缓存的配置 &ndash;&gt;
+                <entry key="authorizationCache" value="1800"/>
+                <entry key="authenticationCache" value="1800"/>
+                <entry key="activeSessionCache" value="1800"/>
+            </map>
+        </property>
+    </bean>
+
+    &lt;!&ndash; cache注解，和spring-ehcache.xml中的只能使用一个 &ndash;&gt;
+    <cache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>-->
 
 </beans>

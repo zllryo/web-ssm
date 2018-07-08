@@ -65,7 +65,7 @@ public class UserController extends  BaseController{
     {
         User user=userService.selectAllByPrimaryKey(id);
          session.setAttribute("user",user);
-        redisCache.setCacheObject("count","6");
+        //redisCache.setCacheObject("count","6");
 
 
          return  "userlook";

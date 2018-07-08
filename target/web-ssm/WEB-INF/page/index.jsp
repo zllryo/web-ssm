@@ -146,7 +146,7 @@
                 </div>
                 <div class="form-group">
                     <label class="checkbox">
-                        <input type="checkbox" name="remember" value="1"/>记住我
+                        <input type="checkbox" name="rememberMe" value="1"/>记住我
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <a href="#" onclick="window.location.href='register.do'">注册</a>
                     </label>

@@ -6,6 +6,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -30,6 +31,7 @@ public class CustomRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException
     {
+        System.out.printf("shrio开始认证");
         UsernamePasswordToken usertoken=(UsernamePasswordToken) token;//获取令牌(里面存放new UsernamePasswordToken放入的账号和密码)
 
         //得到账号和密码
@@ -40,6 +42,8 @@ public class CustomRealm extends AuthorizingRealm {
 
         if(user!=null)//如果用户名存在
         {
+            //先清除缓存
+            //JedisClientSingle.getJedis().del(username);
             //参数1.用户认证的对象(subject.getPrincipal();返回的对象),
             //参数2.从数据库根据用户名查询到的用户的密码
             //参数3.把当前自定义的realm对象传给SimpleAuthenticationInfo,在配置文件需要注入
@@ -56,6 +60,7 @@ public class CustomRealm extends AuthorizingRealm {
     //用于授权
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) 	{
+        System.out.printf("shrio开始授权");
         String name=(String)principals.getPrimaryPrincipal();
         User user=userService.selectByName(name);
         SimpleAuthorizationInfo info=new SimpleAuthorizationInfo();
@@ -86,5 +91,25 @@ public class CustomRealm extends AuthorizingRealm {
         super.clearCachedAuthorizationInfo(principals);
     }
 
+    //清除缓存
+    public void clearCached() {
+        PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+        super.clearCache(principals);
+    }
+
+    /**
+     * 明文密码进行加密
+     * 盐值salt
+     * 密码credentials
+     */
+    public String  StringMD5Yan(Object salt,Object credentials) {
+        int hashIterations = 10000;//加密的次数
+        String hashAlgorithmName = "MD5";//加密方式
+        ByteSource bsalt = ByteSource.Util.bytes(salt);//以账号作为盐值
+        Object simpleHash = new SimpleHash(hashAlgorithmName, credentials,
+                bsalt, hashIterations);
+        return  (String)simpleHash;
+
+    }
 
 }
